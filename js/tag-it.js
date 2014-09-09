@@ -584,7 +584,10 @@
             this._tags().each(function(index, tag) {
                 that.removeTag(tag, false);
             });
-        }
+        },
+        getsearchJSONObject: function () {
+			return JSON.stringify(this.element.data('search'));
+		}
 
     });
 })(jQuery);
