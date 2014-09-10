@@ -586,7 +586,11 @@
             });
         },
         getsearchJSONObject: function () {
-			return JSON.stringify(this.element.data('search'));
+        	var searchObj=$.extend({}, this.element.data('search'));
+        	if(searchObj!=null){
+        		searchObj['extJSON']=JSON.stringify(searchObj['extJSON']);
+        	}
+			return searchObj;
 		}
 
     });
