@@ -435,7 +435,7 @@
         _effectExists: function(name) {
             return Boolean($.effects && ($.effects[name] || ($.effects.effect && $.effects.effect[name])));
         },
-
+        
         createTag: function(value, additionalClass, duringInitialization) {
             var that = this;
 
@@ -530,7 +530,10 @@
                 setTimeout(function () { that._showAutocomplete(); }, 0);
             }
         },
-
+        createNewTag: function(tag,data){ 
+        	this.createTag(tag);
+        	this._findTagByLabel(tag).data('tag-data',data);
+        },
         removeTag: function(tag, animate) {
             animate = typeof animate === 'undefined' ? this.options.animate : animate;
 
