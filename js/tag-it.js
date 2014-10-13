@@ -594,6 +594,74 @@
         		searchObj['extJSON']=JSON.stringify(searchObj['extJSON']);
         	}
 			return searchObj;
+		}, 
+		//returns extendedJSON object from modal (extended search form)
+		
+		//get ExtJSON Object from pmMetadataJSON widget
+	    getExtendedFormJson: function(){
+	    		return $("div[id*='extended']" ).find('form').pmMetadataJSON('getStateObj');
+	    },
+	    setSearchBiMaps: function(bmextSearchAttrMap){
+	    	this['bmextSearchAttrMap']=bmextSearchAttrMap;
+	    },
+	    //gets the tags from extended search form in modal attached to the current search page if exists.
+		setSearchTagsfromFormObject:function(){
+			var extsrchFormObj =this.getExtendedFormJson();
+			this.element.data('search',this.getExtendedFormJson());
+			var curriculumObjs =  $("div[id*='extended']" ).find('form').find('span.pmCurriculumBox').pmCurriculumBox('getCurrBoxObjs');
+			for(var obj in extsrchFormObj){ 
+				if (this.bmextSearchAttrMap.val(obj)!=null && obj!=='undefined' && extsrchFormObj[obj]!=null){
+					//console.log(bmextSearchAttrMap.val(obj));
+					if($.isArray(extsrchFormObj[obj]) && obj!=='curriculumIds'){
+						$.each( extsrchFormObj[obj], function( index, value ){
+							var currentTag=bmextSearchAttrMap.val(obj);
+							var lookupKey=currentTag;
+							var tagvalue='';
+								tagvalue=tagObjectMap[lookupKey].val(value);
+								if ($.inArray(currentTag, attributeItemTypes)>=0){
+									lookupKey='attributeIds';
+									currentTag=tagObjectMap[lookupKey].val(value).split(':')[0]+':'; //add colon to stay consistent with other tags
+									tagvalue=tagObjectMap[lookupKey].val(value).split(':')[1];
+								}
+							var uiTagText=currentTag+tagvalue //value is id of some object eg: bankTitle 
+							this.createTag(uiTagText,currentTag,value);
+						});
+					}
+					else if($.isArray(extsrchFormObj[obj]) && obj==='curriculumIds'){
+							if(curriculumObjs.length>0){
+								var currentTag='cur:';
+								var tagvalue=''; //may have to get selected text for tagvalue instead of actual id value
+								$.each( curriculumObjs, function( index, value ){
+								var uiTagText=currentTag+curriculumObjs[index]['code'] //value is id of some object eg: bankTitle 
+								var value=curriculumObjs[index]['id']
+								this.createTag(uiTagText,currentTag,value);
+								});
+							}
+					}
+					else if (typeof extsrchFormObj[obj]!=='boolean'){ //not arrays, not boolean just a scalar value like resource Id
+							var value=extsrchFormObj[obj];
+							if(obj==='resource'){
+								currentTag='rsc:';
+								var resourceElement=$("div[id*='extended']" ).find('form').find("input[name='resource']");
+								var resourceObject = resourceElement.siblings().find('li.active');
+								var resourceTitle =  resourceObject.data('value').split(']')[1];
+								tagvalue=resourceTitle;
+							}
+						
+							var uiTagText=currentTag+tagvalue //value is id of some object eg: bankTitle 
+							this.createTag(uiTagText,currentTag,value);
+					}
+					else if (typeof extsrchFormObj[obj]==='boolean' ){
+						//console.log(bmextSearchAttrMap.val(obj)+obj);
+						if(extsrchFormObj[obj]){
+							var currentTag=bmextSearchAttrMap.val(obj); 
+							var uiTagText=currentTag+obj;
+							var extValue=extsrchFormObj[obj]; //the value that is being sent in this context eg: true/false
+							this.createTag(uiTagText,currentTag,extValue);
+						}
+					}
+				}
+			}
 		}
 
     });
