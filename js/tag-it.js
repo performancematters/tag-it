@@ -530,7 +530,7 @@
                 setTimeout(function () { that._showAutocomplete(); }, 0);
             }
         },
-        createNewTag: function(tag,data){ 
+        createNewSearchTag: function(tag,data){ 
         	this.createTag(tag);
         	this._findTagByLabel(tag).data('tag-data',data);
         },
@@ -603,20 +603,26 @@
 	    	return $searchBar.pmTypeahead('getExtSearchParams');
 	    	
 	    },
-	    setSearchBiMaps: function(bmextSearchAttrMap){
+	    setTagSearchContext: function(bmextSearchAttrMap,tagObjectMap,attributeItemTypes){
 	    	this['bmextSearchAttrMap']=bmextSearchAttrMap;
+	    	this['tagObjectMap']=tagObjectMap;
+	    	this['attributeItemTypes']=attributeItemTypes;
 	    },
 	    //gets the tags from extended search form in modal attached to the current search page if exists.
 		setSearchTagsfromFormObject:function(){
 			var extsrchFormObj =JSON.parse(this.getExtendedFormJson());
 			this.element.data('search')['extJSON']=extsrchFormObj;
 			var curriculumObjs =  $("div[id*='extended']" ).find('form').find('span.pmCurriculumBox').pmCurriculumBox('getCurrBoxObjs');
+			var bimapforAttributes=this.bmextSearchAttrMap;
+			var tagObjectMap=this.tagObjectMap;
+			var attributeItemTypes=this.attributeItemTypes;
+			var $tagSearchElement = (this.element) ? this.element : this.$element
 			for(var obj in extsrchFormObj){ 
-				if (this.bmextSearchAttrMap.val(obj)!=null && obj!=='undefined' && extsrchFormObj[obj]!=null){
+				if (bimapforAttributes.val(obj)!=null && obj!=='undefined' && extsrchFormObj[obj]!=null){
 					//console.log(bmextSearchAttrMap.val(obj));
 					if($.isArray(extsrchFormObj[obj]) && obj!=='curriculumIds'){
 						$.each( extsrchFormObj[obj], function( index, value ){
-							var currentTag=bmextSearchAttrMap.val(obj);
+							var currentTag=bimapforAttributes.val(obj);
 							var lookupKey=currentTag;
 							var tagvalue='';
 								tagvalue=tagObjectMap[lookupKey].val(value);
@@ -626,7 +632,7 @@
 									tagvalue=tagObjectMap[lookupKey].val(value).split(':')[1];
 								}
 							var uiTagText=currentTag+tagvalue //value is id of some object eg: bankTitle 
-							this.createNewTag(uiTagText,value);
+							$tagSearchElement.tagit('createNewSearchTag',uiTagText,value);
 						});
 					}
 					else if($.isArray(extsrchFormObj[obj]) && obj==='curriculumIds'){
@@ -636,7 +642,7 @@
 								$.each( curriculumObjs, function( index, value ){
 								var uiTagText=currentTag+curriculumObjs[index]['code'] //value is id of some object eg: bankTitle 
 								var value=curriculumObjs[index]['id']
-								this.createNewTag(uiTagText,value);
+								$tagSearchElement.tagit('createNewSearchTag',uiTagText,value);
 								});
 							}
 					}
@@ -651,15 +657,15 @@
 							}
 						
 							var uiTagText=currentTag+tagvalue //value is id of some object eg: bankTitle 
-							this.createNewTag(uiTagText,value);
+							$tagSearchElement.tagit('createNewSearchTag',uiTagText,value);
 					}
 					else if (typeof extsrchFormObj[obj]==='boolean' ){
 						//console.log(bmextSearchAttrMap.val(obj)+obj);
 						if(extsrchFormObj[obj]){
-							var currentTag=this.bmextSearchAttrMap.val(obj); 
+							var currentTag=bimapforAttributes.val(obj); 
 							var uiTagText=currentTag+obj;
 							var extValue=extsrchFormObj[obj]; //the value that is being sent in this context eg: true/false
-							this.createNewTag(uiTagText,extValue);
+							$tagSearchElement.tagit('createNewSearchTag',uiTagText,value);
 						}
 					}
 				}
