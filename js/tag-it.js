@@ -534,6 +534,9 @@
         	this.createTag(tag);
         	this._findTagByLabel(tag).data('tag-data',data);
         },
+        getTagsLength: function(){
+        	 return this._tags().length;
+        },
         removeTag: function(tag, animate) {
             animate = typeof animate === 'undefined' ? this.options.animate : animate;
 
