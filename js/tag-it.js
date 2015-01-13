@@ -363,6 +363,15 @@
         _tags: function() {
             return this.tagList.find('.tagit-choice:not(.removed)');
         },
+        
+        gettags:function () {
+        	var labels = this.tagList.find('.tagit-choice:not(.removed)');
+        	var tagspans=[];
+        	$.each(labels,function(){
+        		tagspans.push($(this).find('span.tagit-label'));
+        	});
+            return tagspans;
+        },
 
         assignedTags: function() {
             // Returns an array of tag string values
@@ -575,7 +584,7 @@
             }
 
         },
-
+        
         removeTagByLabel: function(tagLabel, animate) {
             var toRemove = this._findTagByLabel(tagLabel);
             if (!toRemove) {
@@ -590,6 +599,32 @@
             this._tags().each(function(index, tag) {
                 that.removeTag(tag, false);
             });
+        },
+        //modifies existing tag -e.g. for scalar tags like resources - there should only be one tag
+        modifyTag: function(tagLabel, tagValue){
+        	 var currenttags= this.gettags();
+        	 var foundTag=false;
+        	 $.each(currenttags,function(){
+        		 var tagSpan= $(this);
+        		 if(tagLabel.split(':')[0]===tagSpan.text().split(':')[0]){
+        			 tagSpan.text(tagSpan.text().split(':')[0]+':'+tagValue);
+        			 foundTag=true;
+        			 return;
+        		 }
+        	 })
+        	if(!foundTag) this.createNewSearchTag(tagLabel,tagValue);
+        	 
+        	
+        },
+        findTagPrefix:function(prefix){
+        	var currenttags=this.gettags();
+        	 $.each(currenttags,function(){
+        		 var tagSpan= $(this);
+        		 if(prefix===tagSpan.text().split(':')[0]){
+        				 return true;
+        		 }
+        	 })
+        	 return false;
         },
         getsearchJSONObject: function () {
         	var searchObj=$.extend({}, this.element.data('search'));
