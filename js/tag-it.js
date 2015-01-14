@@ -687,7 +687,7 @@
 					else if (typeof extsrchFormObj[obj]!=='boolean'){ //not arrays, not boolean just a scalar value like resource Id
 							var value=extsrchFormObj[obj];
 							if(obj==='resource'){
-								currentTag='rsc:';
+								currentTag='res:';
 								var resourceElement=$("div[id*='extended']" ).find('form').find("input[name='resource']");
 								var resourceObject = resourceElement.siblings().find('li.active');
 								var resourceTitle =  resourceObject.data('value').split(']')[1];
