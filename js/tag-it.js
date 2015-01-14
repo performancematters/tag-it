@@ -541,7 +541,8 @@
         },
         createNewSearchTag: function(tag,data){ 
         	this.createTag(tag);
-        	this._findTagByLabel(tag).data('tag-data',data);
+        	var currentTag = this.findTag(tag);
+        	if(currentTag!=null) {currentTag.data('tag-data',data);}
         },
         getTagsLength: function(){
         	 return this._tags().length;
@@ -616,6 +617,17 @@
         	 
         	
         },
+        findTag:function(tagLabel){
+        	var labels = this.tagList.find('.tagit-choice:not(.removed)');
+        	var tag=null;
+        	$.each(labels,function(){
+        		if($(this).find('span.tagit-label').text()===tagLabel.trim()){
+        			tag=$(this);
+        			return;
+        		}
+        	});
+        	return tag;
+        },
         findTagPrefix:function(prefix){
         	var currenttags=this.gettags();
         	 $.each(currenttags,function(){
@@ -633,6 +645,14 @@
         	}
 			return searchObj;
 		}, 
+		//binds the ids of any extended search form modal to update the form when a tag is added/removed/modified
+		bindExtFormControls: function(bmextSearchAttrMap,tagObjectMap,attributeItemTypes){
+			this['bmextSearchAttrMap']=bmextSearchAttrMap;
+	    	this['tagObjectMap']=tagObjectMap;
+	    	this['attributeItemTypes']=attributeItemTypes;
+			var extform =$("div[id*='extended']" ).find('form');
+			
+		},
 		//returns extendedJSON object from modal (extended search form)
 		
 		//get ExtJSON Object from pmMetadataJSON widget
