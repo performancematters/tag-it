@@ -543,6 +543,16 @@
         	this.createTag(tag);
         	var currentTag = this.findTag(tag);
         	if(currentTag!=null) {currentTag.data('tag-data',data);}
+        	var tagPrefix=tag.split(':')[0].trim()+':';
+        	var tagContent=tag.split(':')[1].trim();
+        	if(this['tagstoFormIdsMap'][tagPrefix]!=null){
+        		if($('#s2id_'+this['tagstoFormIdsMap'][tagPrefix]).length>0){
+        			$('#s2id_'+this['tagstoFormIdsMap'][tagPrefix]).select2('val',tagContent);
+        		}
+        		else if($('#'+this['tagstoFormIdsMap'][tagPrefix]).length>0){
+        			$('#'+this['tagstoFormIdsMap'][tagPrefix]).val(tagContent);
+        		}
+        	}
         },
         getTagsLength: function(){
         	 return this._tags().length;
@@ -646,7 +656,7 @@
 			return searchObj;
 		}, 
 		//binds the ids of any extended search form modal to update the form when a tag is added/removed/modified
-		bindExtFormControls: function(bmextSearchAttrMap,tagObjectMap,attributeItemTypes){
+		bindExtFormControls: function(bmextSearchAttrMap,tagObjectMap,attributeItemTypes,attributeCodeMap){
 			this['bmextSearchAttrMap']=bmextSearchAttrMap;
 	    	this['tagObjectMap']=tagObjectMap;
 	    	this['attributeItemTypes']=attributeItemTypes;
@@ -654,13 +664,15 @@
 			this['ddown']= this['extform'].find('div select');
 			this['tagstoFormIdsMap']={};
 			var elementMap=this['tagstoFormIdsMap'];
+			var attrCodeMap=attributeCodeMap;
 			$.each(this['ddown'],function(){
 				var select2Id = $(this).attr('id');
 				var dataId  = $(this).data('id');
 				var datatype=$(this).data('type');
 				if(select2Id !=null){
-					//if(eleme) //hack for 
-					elementMap[bmextSearchAttrMap.val(dataId)]=select2Id;
+					if(datatype==='attributeIds')
+						elementMap[attrCodeMap.val(dataId)]=select2Id;
+					else elementMap[bmextSearchAttrMap.val(dataId)]=select2Id;
 				}
 			})
 			console.log(this['tagstoFormIdsMap']);
