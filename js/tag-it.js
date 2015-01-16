@@ -650,8 +650,20 @@
 			this['bmextSearchAttrMap']=bmextSearchAttrMap;
 	    	this['tagObjectMap']=tagObjectMap;
 	    	this['attributeItemTypes']=attributeItemTypes;
-			var extform =$("div[id*='extended']" ).find('form');
-			
+			this['extform'] =$("div[id*='extended']" ).find('form');
+			this['ddown']= this['extform'].find('div select');
+			this['tagstoFormIdsMap']={};
+			var elementMap=this['tagstoFormIdsMap'];
+			$.each(this['ddown'],function(){
+				var select2Id = $(this).attr('id');
+				var dataId  = $(this).data('id');
+				var datatype=$(this).data('type');
+				if(select2Id !=null){
+					//if(eleme) //hack for 
+					elementMap[bmextSearchAttrMap.val(dataId)]=select2Id;
+				}
+			})
+			console.log(this['tagstoFormIdsMap']);
 		},
 		//returns extendedJSON object from modal (extended search form)
 		
@@ -715,7 +727,7 @@
 							}
 						
 							var uiTagText=currentTag+tagvalue //value is id of some object eg: bankTitle 
-							$tagSearchElement.tagit('modifyTag',uiTagText,tagvalue);
+							$tagSearchElement.tagit('createNewSearchTag',uiTagText,value);
 					}
 					else if (typeof extsrchFormObj[obj]==='boolean' ){
 						//console.log(bmextSearchAttrMap.val(obj)+obj);
