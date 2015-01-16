@@ -715,7 +715,7 @@
 							}
 						
 							var uiTagText=currentTag+tagvalue //value is id of some object eg: bankTitle 
-							$tagSearchElement.tagit('createNewSearchTag',uiTagText,value);
+							$tagSearchElement.tagit('modifyTag',uiTagText,tagvalue);
 					}
 					else if (typeof extsrchFormObj[obj]==='boolean' ){
 						//console.log(bmextSearchAttrMap.val(obj)+obj);
