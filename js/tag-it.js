@@ -545,9 +545,25 @@
         	if(currentTag!=null) {currentTag.data('tag-data',data);}
         	var tagPrefix=tag.split(':')[0].trim()+':';
         	var tagContent=tag.split(':')[1].trim();
+        	
         	if(this['tagstoFormIdsMap'][tagPrefix]!=null){
+        		var id='#'+this['tagstoFormIdsMap'][tagPrefix];
+	        	var values=[];
+        		if($(id).attr('multiple')!=null){
+        			values=$(id).find('option:selected').map(function(){return $(this).val()}); //values selected so far, for multiple selectable elements
+        		}
+        		else{
+        			values=[$(id).find('option:selected')];
+        		}
         		if($('#s2id_'+this['tagstoFormIdsMap'][tagPrefix]).length>0){
-        			$('#s2id_'+this['tagstoFormIdsMap'][tagPrefix]).select2('val',tagContent);
+        			var newvalue=$(id).find('option').filter(function() { 
+        			    return ($(this).text() == tagContent); //failsafe check
+        			}).attr('value');
+        			if($(id).attr('multiple')!=null){
+        				values.push(newvalue);
+        				$(id).select2().val(values).trigger('change');
+        			}
+        			else $(id).select2().val(newvalue).trigger('change');
         		}
         		else if($('#'+this['tagstoFormIdsMap'][tagPrefix]).length>0){
         			var id='#'+this['tagstoFormIdsMap'][tagPrefix];
