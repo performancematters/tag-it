@@ -552,8 +552,8 @@
         		else if($('#'+this['tagstoFormIdsMap'][tagPrefix]).length>0){
         			var id='#'+this['tagstoFormIdsMap'][tagPrefix];
         			$(id).find('option').filter(function() { 
-        			    return ($(this).text() == tagContent); //To select Blue
-        			}).prop('selected', true);
+        			    return ($(this).text() == tagContent); 
+        			}).attr('selected', true);
         		}
         	}
         },
