@@ -550,7 +550,10 @@
         			$('#s2id_'+this['tagstoFormIdsMap'][tagPrefix]).select2('val',tagContent);
         		}
         		else if($('#'+this['tagstoFormIdsMap'][tagPrefix]).length>0){
-        			$('#'+this['tagstoFormIdsMap'][tagPrefix]).val(tagContent);
+        			var id='#'+this['tagstoFormIdsMap'][tagPrefix];
+        			$(id).find('option').filter(function() { 
+        			    return ($(this).text() == tagContent); //To select Blue
+        			}).prop('selected', true);
         		}
         	}
         },
@@ -617,9 +620,12 @@
         	 var foundTag=false;
         	 $.each(currenttags,function(){
         		 var tagSpan= $(this);
-        		 if(tagLabel.split(':')[0]===tagSpan.text().split(':')[0]){
-        			 tagSpan.text(tagSpan.text().split(':')[0]+':'+tagValue);
+        		 var tagPrefix=tagLabel.split(':')[0];
+        		 var tagContent=tagLabel.split(':')[1];
+        		 if(tagPrefix===tagSpan.text().split(':')[0]){
+        			 tagSpan.text(tagSpan.text().split(':')[0]+':'+tagContent);
         			 foundTag=true;
+        			 $(this).data('tag-data',tagValue);
         			 return;
         		 }
         	 })
