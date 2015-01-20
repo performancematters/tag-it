@@ -565,8 +565,7 @@
         			}
         			else $(id).select2().val(newvalue).trigger('change');
         		}
-        		else if($('#'+this['tagstoFormIdsMap'][tagPrefix]).length>0){
-        			var id='#'+this['tagstoFormIdsMap'][tagPrefix];
+        		if($(id).length>0){
         			$(id).find('option').filter(function() { 
         			    return ($(this).text() == tagContent); 
         			}).attr('selected', true);
