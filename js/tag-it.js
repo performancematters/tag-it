@@ -547,35 +547,51 @@
         	var tagContent=tag.split(':')[1].trim();
         	
         	if(this['selectFormIdsMap'][tagPrefix]!=null){
-        		var id='#'+this['selectFormIdsMap'][tagPrefix];
-	        	var values=[];
-	        	var elem=$(id);
+        		var values=[];
+	        	var elem=this['selectFormIdsMap'][tagPrefix];
         		if(elem.attr('multiple')!=null){
         			values=elem.find('option:selected').map(function(){return $(this).val()}); //values selected so far, for multiple selectable elements
         		}
         		else{
         			values=[elem.find('option:selected')];
         		}
-        		if($('#s2id_'+this['selectFormIdsMap'][tagPrefix]).length>0){
-        			var newvalue=elem.find('option').filter(function() { 
-        			    return ($(this).text() == tagContent); //failsafe check
-        			}).attr('value');
-        			if(elem.attr('multiple')!=null){
-        				values.push(newvalue);
-        				elem.select2().val(values).trigger('change');
-        			}
-        			else elem.select2().val(newvalue).trigger('change');
-        		}
+    			var newvalue=elem.find('option').filter(function() { 
+    			    return ($(this).text() == tagContent); //failsafe check
+    			}).attr('value');
+    			if(elem.attr('multiple')!=null){
+    				values.push(newvalue);
+    				elem.select2().val(values).trigger('change');
+    			}
+    			else elem.select2().val(newvalue).trigger('change');
+        		
     			elem.find('option').filter(function() { 
     			    return ($(this).text() == tagContent); 
     			}).attr('selected', true);
     		
         	}
         	else if(this['inputChoices'][tagPrefix]!=null){
-        		var name=this['inputChoices'][tagPrefix];
-        		var elem=$("input[name='"+name+"']");
+        		var elem=this['inputChoices'][tagPrefix];
     			elem.prop("checked", !elem.prop("checked"));
 			}
+        	else if(this['curriculumBoxes'][tagPrefix]!=null){
+        		 var elem=this['curriculumBoxes'][tagPrefix];
+        		 var obj={
+        				 	"bShowRmBlock":true,
+        				 	"code":tagContent,
+        				 	"curriculumId":data,
+        				 	"description":"",
+        		 			"id":data,
+        		 			"placement":"left",
+        		 			"toggle":"tooltip"
+        		 		 }
+        		 try {
+        			 elem.pmCurriculumBox('getCurrBoxObjs')
+        		 }
+        		 catch(err){
+        			 elem.pmCurriculumBox();
+        		 }
+        		 elem.pmCurriculumBox('addItem',obj);
+        	}
         },
         getTagsLength: function(){
         	 return this._tags().length;
@@ -690,7 +706,10 @@
 			var ddown= this['extform'].find('div select');
 			var choices=this['extform'].find('div input').filter(function(){ return $(this).attr('type')=='checkbox' });
 			var searches=this['extform'].find('div input').filter(function(){ return $(this).attr('type')=='search' });
-			this['selectFormIdsMap']={};this['inputChoices']={};this['inputSearches']={};
+			var curriculums=this['extform'].find('div a.select-curriculum').siblings('span').filter(function(){
+									return $(this).data('pmsel')!=null
+								});
+			this['selectFormIdsMap']={};this['inputChoices']={};this['inputSearches']={};this['curriculumBoxes']={};
 			
 			var elementMap=this['selectFormIdsMap'];
 			var attrCodeMap=attributeCodeMap;
@@ -700,25 +719,29 @@
 				var datatype=$(this).data('type');
 				if(select2Id !=null){
 					if(datatype==='attributeIds')
-						elementMap[attrCodeMap.val(dataId)]=select2Id;
-					else elementMap[bmextSearchAttrMap.val(dataId)]=select2Id;
+						elementMap[attrCodeMap.val(dataId)]=$(this);
+					else elementMap[bmextSearchAttrMap.val(dataId)]=$(this);
 				}
 			});
 			elementMap=this['inputChoices'];
 			$.each(choices,function(){
 				var name=$(this).attr('name');
-				var type=$(this).attr('type');
-				elementMap[bmextSearchAttrMap.val(name)]=name;
+				elementMap[bmextSearchAttrMap.val(name)]=$(this);
 			});
 			elementMap=this['inputSearches'];
 			$.each(searches,function(){
 				var id=$(this).attr('id');
 				var type=$(this).attr('type');
-				elementMap[bmextSearchAttrMap.val(id)]=id;
+				elementMap[bmextSearchAttrMap.val(id)]=$(this);
+			});
+			elementMap=this['curriculumBoxes'];
+			$.each(curriculums,function(){
+					elementMap[bmextSearchAttrMap.val('curriculumIds')]=$(this);
 			});
 			console.log(this['selectFormIdsMap']);
 			console.log(this['inputChoices']);
 			console.log(this['inputSearches']);
+			console.log(this['curriculumBoxes']);
 		},
 		//returns extendedJSON object from modal (extended search form)
 		
