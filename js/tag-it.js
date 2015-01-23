@@ -546,31 +546,36 @@
         	var tagPrefix=tag.split(':')[0].trim()+':';
         	var tagContent=tag.split(':')[1].trim();
         	
-        	if(this['tagstoFormIdsMap'][tagPrefix]!=null){
-        		var id='#'+this['tagstoFormIdsMap'][tagPrefix];
+        	if(this['selectFormIdsMap'][tagPrefix]!=null){
+        		var id='#'+this['selectFormIdsMap'][tagPrefix];
 	        	var values=[];
-        		if($(id).attr('multiple')!=null){
-        			values=$(id).find('option:selected').map(function(){return $(this).val()}); //values selected so far, for multiple selectable elements
+	        	var elem=$(id);
+        		if(elem.attr('multiple')!=null){
+        			values=elem.find('option:selected').map(function(){return $(this).val()}); //values selected so far, for multiple selectable elements
         		}
         		else{
-        			values=[$(id).find('option:selected')];
+        			values=[elem.find('option:selected')];
         		}
-        		if($('#s2id_'+this['tagstoFormIdsMap'][tagPrefix]).length>0){
-        			var newvalue=$(id).find('option').filter(function() { 
+        		if($('#s2id_'+this['selectFormIdsMap'][tagPrefix]).length>0){
+        			var newvalue=elem.find('option').filter(function() { 
         			    return ($(this).text() == tagContent); //failsafe check
         			}).attr('value');
-        			if($(id).attr('multiple')!=null){
+        			if(elem.attr('multiple')!=null){
         				values.push(newvalue);
-        				$(id).select2().val(values).trigger('change');
+        				elem.select2().val(values).trigger('change');
         			}
-        			else $(id).select2().val(newvalue).trigger('change');
+        			else elem.select2().val(newvalue).trigger('change');
         		}
-        		if($(id).length>0){
-        			$(id).find('option').filter(function() { 
-        			    return ($(this).text() == tagContent); 
-        			}).attr('selected', true);
-        		}
+    			elem.find('option').filter(function() { 
+    			    return ($(this).text() == tagContent); 
+    			}).attr('selected', true);
+    		
         	}
+        	else if(this['inputChoices'][tagPrefix]!=null){
+        		var name=this['inputChoices'][tagPrefix];
+        		var elem=$("input[name='"+name+"']");
+    			elem.prop("checked", !elem.prop("checked"));
+			}
         },
         getTagsLength: function(){
         	 return this._tags().length;
@@ -682,11 +687,14 @@
 	    	this['tagObjectMap']=tagObjectMap;
 	    	this['attributeItemTypes']=attributeItemTypes;
 			this['extform'] =$("div[id*='extended']" ).find('form');
-			this['ddown']= this['extform'].find('div select');
-			this['tagstoFormIdsMap']={};
-			var elementMap=this['tagstoFormIdsMap'];
+			var ddown= this['extform'].find('div select');
+			var choices=this['extform'].find('div input').filter(function(){ return $(this).attr('type')=='checkbox' });
+			var searches=this['extform'].find('div input').filter(function(){ return $(this).attr('type')=='search' });
+			this['selectFormIdsMap']={};this['inputChoices']={};this['inputSearches']={};
+			
+			var elementMap=this['selectFormIdsMap'];
 			var attrCodeMap=attributeCodeMap;
-			$.each(this['ddown'],function(){
+			$.each(ddown,function(){
 				var select2Id = $(this).attr('id');
 				var dataId  = $(this).data('id');
 				var datatype=$(this).data('type');
@@ -695,8 +703,22 @@
 						elementMap[attrCodeMap.val(dataId)]=select2Id;
 					else elementMap[bmextSearchAttrMap.val(dataId)]=select2Id;
 				}
-			})
-			console.log(this['tagstoFormIdsMap']);
+			});
+			elementMap=this['inputChoices'];
+			$.each(choices,function(){
+				var name=$(this).attr('name');
+				var type=$(this).attr('type');
+				elementMap[bmextSearchAttrMap.val(name)]=name;
+			});
+			elementMap=this['inputSearches'];
+			$.each(searches,function(){
+				var id=$(this).attr('id');
+				var type=$(this).attr('type');
+				elementMap[bmextSearchAttrMap.val(id)]=id;
+			});
+			console.log(this['selectFormIdsMap']);
+			console.log(this['inputChoices']);
+			console.log(this['inputSearches']);
 		},
 		//returns extendedJSON object from modal (extended search form)
 		
