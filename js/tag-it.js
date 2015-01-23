@@ -703,7 +703,7 @@
 	    	this['tagObjectMap']=tagObjectMap;
 	    	this['attributeItemTypes']=attributeItemTypes;
 			this['extform'] =$("div[id*='extended']" ).find('form');
-			var ddown= this['extform'].find('div select');
+			var ddown= this['extform'].find('select');
 			var choices=this['extform'].find('div input').filter(function(){ return $(this).attr('type')=='checkbox' });
 			var searches=this['extform'].find('div input').filter(function(){ return $(this).attr('type')=='search' });
 			var curriculums=this['extform'].find('div a.select-curriculum').siblings('span').filter(function(){
@@ -717,11 +717,9 @@
 				var select2Id = $(this).attr('id');
 				var dataId  = $(this).data('id');
 				var datatype=$(this).data('type');
-				if(select2Id !=null){
-					if(datatype==='attributeIds')
-						elementMap[attrCodeMap.val(dataId)]=$(this);
-					else elementMap[bmextSearchAttrMap.val(dataId)]=$(this);
-				}
+				if(datatype==='attributeIds')
+					elementMap[attrCodeMap.val(dataId)]=$(this);
+				else elementMap[bmextSearchAttrMap.val(dataId)]=$(this);
 			});
 			elementMap=this['inputChoices'];
 			$.each(choices,function(){
@@ -773,6 +771,14 @@
 							var currentTag=bimapforAttributes.val(obj);
 							var lookupKey=currentTag;
 							var tagvalue='';
+							if(tagObjectMap[lookupKey].val(value)==null){
+								var newElem=$tagSearchElement.tagit().data().uiTagit.selectFormIdsMap[currentTag].select2();
+								if(newElem.select2('data')!=null){
+									$.each(newElem.select2('data'),function(){
+										tagObjectMap[lookupKey].push(this.text,this.id);
+									})
+								}
+								}
 								tagvalue=tagObjectMap[lookupKey].val(value);
 								if ($.inArray(currentTag, attributeItemTypes)>=0){
 									lookupKey='attributeIds';
