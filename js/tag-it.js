@@ -585,12 +585,19 @@
         		 			"toggle":"tooltip"
         		 		 }
         		 try {
-        			 elem.pmCurriculumBox('getCurrBoxObjs')
+        			 elem.pmCurriculumBox('getCurrBoxObjs');
         		 }
         		 catch(err){
         			 elem.pmCurriculumBox();
         		 }
-        		 elem.pmCurriculumBox('addItem',obj);
+        		 var existsCur=false;
+        		 $.each(elem.pmCurriculumBox('getCurrBoxObjs'),function(){
+        			 				if(obj.id==this.id){
+        			 					existsCur=true;
+        			 					return false;
+        			 				}
+				});
+        		 if(!existsCur) elem.pmCurriculumBox('addItem',obj);
         	}
         },
         getTagsLength: function(){
