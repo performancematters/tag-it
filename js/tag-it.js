@@ -550,7 +550,7 @@
         		var values=[];
 	        	var elem=this['selectFormIdsMap'][tagPrefix];
         		if(elem.attr('multiple')!=null){
-        			values=elem.find('option:selected').map(function(){return $(this).val()}); //values selected so far, for multiple selectable elements
+        			values=$.makeArray((elem.find('option:selected').map(function(){return $(this).val()}))); //values selected so far, for multiple selectable elements
         		}
         		else{
         			values=[elem.find('option:selected')];
