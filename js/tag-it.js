@@ -363,15 +363,6 @@
         _tags: function() {
             return this.tagList.find('.tagit-choice:not(.removed)');
         },
-        
-        gettags:function () {
-        	var labels = this.tagList.find('.tagit-choice:not(.removed)');
-        	var tagspans=[];
-        	$.each(labels,function(){
-        		tagspans.push($(this).find('span.tagit-label'));
-        	});
-            return tagspans;
-        },
 
         assignedTags: function() {
             // Returns an array of tag string values
@@ -444,7 +435,7 @@
         _effectExists: function(name) {
             return Boolean($.effects && ($.effects[name] || ($.effects.effect && $.effects.effect[name])));
         },
-        
+
         createTag: function(value, additionalClass, duringInitialization) {
             var that = this;
 
@@ -539,70 +530,7 @@
                 setTimeout(function () { that._showAutocomplete(); }, 0);
             }
         },
-        createNewSearchTag: function(tag,data){ 
-        	this.createTag(tag);
-        	var currentTag = this.findTag(tag);
-        	if(currentTag!=null) {currentTag.data('tag-data',data);}
-        	var tagPrefix=tag.split(':')[0].trim()+':';
-        	var tagContent=tag.split(':')[1].trim();
-        	
-        	if(this['selectFormIdsMap'][tagPrefix]!=null){
-        		var values=[];
-	        	var elem=this['selectFormIdsMap'][tagPrefix];
-        		if(elem.attr('multiple')!=null){
-        			values=elem.find('option:selected').map(function(){return $(this).val()}); //values selected so far, for multiple selectable elements
-        		}
-        		else{
-        			values=[elem.find('option:selected')];
-        		}
-    			var newvalue=elem.find('option').filter(function() { 
-    			    return ($(this).text() == tagContent); //failsafe check
-    			}).attr('value');
-    			if(elem.attr('multiple')!=null){
-    				values.push(newvalue);
-    				elem.select2().val(values).trigger('change');
-    			}
-    			else elem.select2().val(newvalue).trigger('change');
-        		
-    			elem.find('option').filter(function() { 
-    			    return ($(this).text() == tagContent); 
-    			}).attr('selected', true);
-    		
-        	}
-        	else if(this['inputChoices'][tagPrefix]!=null){
-        		var elem=this['inputChoices'][tagPrefix];
-    			elem.prop("checked", !elem.prop("checked"));
-			}
-        	else if(this['curriculumBoxes'][tagPrefix]!=null){
-        		 var elem=this['curriculumBoxes'][tagPrefix];
-        		 var obj={
-        				 	"bShowRmBlock":true,
-        				 	"code":tagContent,
-        				 	"curriculumId":data,
-        				 	"description":"",
-        		 			"id":data,
-        		 			"placement":"left",
-        		 			"toggle":"tooltip"
-        		 		 }
-        		 try {
-        			 elem.pmCurriculumBox('getCurrBoxObjs');
-        		 }
-        		 catch(err){
-        			 elem.pmCurriculumBox();
-        		 }
-        		 var existsCur=false;
-        		 $.each(elem.pmCurriculumBox('getCurrBoxObjs'),function(){
-        			 				if(obj.id==this.id){
-        			 					existsCur=true;
-        			 					return false;
-        			 				}
-				});
-        		 if(!existsCur) elem.pmCurriculumBox('addItem',obj);
-        	}
-        },
-        getTagsLength: function(){
-        	 return this._tags().length;
-        },
+
         removeTag: function(tag, animate) {
             animate = typeof animate === 'undefined' ? this.options.animate : animate;
 
@@ -641,7 +569,7 @@
             }
 
         },
-        
+
         removeTagByLabel: function(tagLabel, animate) {
             var toRemove = this._findTagByLabel(tagLabel);
             if (!toRemove) {
@@ -656,183 +584,7 @@
             this._tags().each(function(index, tag) {
                 that.removeTag(tag, false);
             });
-        },
-        //modifies existing tag -e.g. for scalar tags like resources - there should only be one tag
-        modifyTag: function(tagLabel, tagValue){
-        	 var currenttags= this.gettags();
-        	 var foundTag=false;
-        	 $.each(currenttags,function(){
-        		 var tagSpan= $(this);
-        		 var tagPrefix=tagLabel.split(':')[0];
-        		 var tagContent=tagLabel.split(':')[1];
-        		 if(tagPrefix===tagSpan.text().split(':')[0]){
-        			 tagSpan.text(tagSpan.text().split(':')[0]+':'+tagContent);
-        			 foundTag=true;
-        			 $(this).data('tag-data',tagValue);
-        			 return;
-        		 }
-        	 })
-        	if(!foundTag) this.createNewSearchTag(tagLabel,tagValue);
-        	 
-        	
-        },
-        findTag:function(tagLabel){
-        	var labels = this.tagList.find('.tagit-choice:not(.removed)');
-        	var tag=null;
-        	$.each(labels,function(){
-        		if($(this).find('span.tagit-label').text()===tagLabel.trim()){
-        			tag=$(this);
-        			return;
-        		}
-        	});
-        	return tag;
-        },
-        findTagPrefix:function(prefix){
-        	var currenttags=this.gettags();
-        	 $.each(currenttags,function(){
-        		 var tagSpan= $(this);
-        		 if(prefix===tagSpan.text().split(':')[0]){
-        				 return true;
-        		 }
-        	 })
-        	 return false;
-        },
-        getsearchJSONObject: function () {
-        	var searchObj=$.extend({}, this.element.data('search'));
-        	if(searchObj!=null){
-        		searchObj['extJSON']=JSON.stringify(searchObj['extJSON']);
-        	}
-			return searchObj;
-		}, 
-		//binds the ids of any extended search form modal to update the form when a tag is added/removed/modified
-		bindExtFormControls: function(bmextSearchAttrMap,tagObjectMap,attributeItemTypes,attributeCodeMap){
-			this['bmextSearchAttrMap']=bmextSearchAttrMap;
-	    	this['tagObjectMap']=tagObjectMap;
-	    	this['attributeItemTypes']=attributeItemTypes;
-			this['extform'] =$("div[id*='extended']" ).find('form');
-			var ddown= this['extform'].find('select');
-			var choices=this['extform'].find('div input').filter(function(){ return $(this).attr('type')=='checkbox' });
-			var searches=this['extform'].find('div input').filter(function(){ return $(this).attr('type')=='search' });
-			var curriculums=this['extform'].find('div a.select-curriculum').siblings('span').filter(function(){
-									return $(this).data('pmsel')!=null
-								});
-			this['selectFormIdsMap']={};this['inputChoices']={};this['inputSearches']={};this['curriculumBoxes']={};
-			
-			var elementMap=this['selectFormIdsMap'];
-			var attrCodeMap=attributeCodeMap;
-			$.each(ddown,function(){
-				var select2Id = $(this).attr('id');
-				var dataId  = $(this).data('id');
-				var datatype=$(this).data('type');
-				if(datatype==='attributeIds')
-					elementMap[attrCodeMap.val(dataId)]=$(this);
-				else elementMap[bmextSearchAttrMap.val(dataId)]=$(this);
-			});
-			elementMap=this['inputChoices'];
-			$.each(choices,function(){
-				var name=$(this).attr('name');
-				elementMap[bmextSearchAttrMap.val(name)]=$(this);
-			});
-			elementMap=this['inputSearches'];
-			$.each(searches,function(){
-				var id=$(this).attr('id');
-				var type=$(this).attr('type');
-				elementMap[bmextSearchAttrMap.val(id)]=$(this);
-			});
-			elementMap=this['curriculumBoxes'];
-			$.each(curriculums,function(){
-					elementMap[bmextSearchAttrMap.val('curriculumIds')]=$(this);
-			});
-			console.log(this['selectFormIdsMap']);
-			console.log(this['inputChoices']);
-			console.log(this['inputSearches']);
-			console.log(this['curriculumBoxes']);
-		},
-		//returns extendedJSON object from modal (extended search form)
-		
-		//get ExtJSON Object from pmMetadataJSON widget
-	    getExtendedFormJson: function(){
-	    	var $searchBar=$( "input[id^='pmSearch']" );
-	    	return $searchBar.pmTypeahead('getExtSearchParams');
-	    	
-	    },
-	    setTagSearchContext: function(bmextSearchAttrMap,tagObjectMap,attributeItemTypes){
-	    	this['bmextSearchAttrMap']=bmextSearchAttrMap;
-	    	this['tagObjectMap']=tagObjectMap;
-	    	this['attributeItemTypes']=attributeItemTypes;
-	    },
-	    //gets the tags from extended search form in modal attached to the current search page if exists.
-		setSearchTagsfromFormObject:function(){
-			var extsrchFormObj =JSON.parse(this.getExtendedFormJson());
-			this.element.data('search')['extJSON']=extsrchFormObj;
-			var curriculumObjs =  $("div[id*='extended']" ).find('form').find('span.pmCurriculumBox').pmCurriculumBox('getCurrBoxObjs');
-			var bimapforAttributes=this.bmextSearchAttrMap;
-			var tagObjectMap=this.tagObjectMap;
-			var attributeItemTypes=this.attributeItemTypes;
-			var $tagSearchElement = (this.element) ? this.element : this.$element
-			for(var obj in extsrchFormObj){ 
-				if (bimapforAttributes.val(obj)!=null && obj!=='undefined' && extsrchFormObj[obj]!=null){
-					//console.log(bmextSearchAttrMap.val(obj));
-					if($.isArray(extsrchFormObj[obj]) && obj!=='curriculumIds'){
-						$.each( extsrchFormObj[obj], function( index, value ){
-							var currentTag=bimapforAttributes.val(obj);
-							var lookupKey=currentTag;
-							var tagvalue='';
-							if(tagObjectMap[lookupKey].val(value)==null){
-								var newElem=$tagSearchElement.tagit().data().uiTagit.selectFormIdsMap[currentTag].select2();
-								if(newElem.select2('data')!=null){
-									$.each(newElem.select2('data'),function(){
-										tagObjectMap[lookupKey].push(this.text,this.id);
-									})
-								}
-								}
-								tagvalue=tagObjectMap[lookupKey].val(value);
-								if ($.inArray(currentTag, attributeItemTypes)>=0){
-									lookupKey='attributeIds';
-									currentTag=tagObjectMap[lookupKey].val(value).split(':')[0]+':'; //add colon to stay consistent with other tags
-									tagvalue=tagObjectMap[lookupKey].val(value).split(':')[1];
-								}
-							var uiTagText=currentTag+tagvalue //value is id of some object eg: bankTitle 
-							$tagSearchElement.tagit('createNewSearchTag',uiTagText,value);
-						});
-					}
-					else if($.isArray(extsrchFormObj[obj]) && obj==='curriculumIds'){
-							if(curriculumObjs.length>0){
-								var currentTag='cur:';
-								var tagvalue=''; //may have to get selected text for tagvalue instead of actual id value
-								$.each( curriculumObjs, function( index, value ){
-								var uiTagText=currentTag+curriculumObjs[index]['code'] //value is id of some object eg: bankTitle 
-								var value=curriculumObjs[index]['id']
-								$tagSearchElement.tagit('createNewSearchTag',uiTagText,value);
-								});
-							}
-					}
-					else if (typeof extsrchFormObj[obj]!=='boolean'){ //not arrays, not boolean just a scalar value like resource Id
-							var value=extsrchFormObj[obj];
-							if(obj==='resource'){
-								currentTag='res:';
-								var resourceElement=$("div[id*='extended']" ).find('form').find("input[name='resource']");
-								var resourceObject = resourceElement.siblings().find('li.active');
-								var resourceTitle =  resourceObject.data('value').split(']')[1];
-								tagvalue=resourceTitle;
-							}
-						
-							var uiTagText=currentTag+tagvalue //value is id of some object eg: bankTitle 
-							$tagSearchElement.tagit('createNewSearchTag',uiTagText,value);
-					}
-					else if (typeof extsrchFormObj[obj]==='boolean' ){
-						//console.log(bmextSearchAttrMap.val(obj)+obj);
-						if(extsrchFormObj[obj]){
-							var currentTag=bimapforAttributes.val(obj); 
-							var uiTagText=currentTag+obj;
-							var extValue=extsrchFormObj[obj]; //the value that is being sent in this context eg: true/false
-							$tagSearchElement.tagit('createNewSearchTag',uiTagText,value);
-						}
-					}
-				}
-			}
-		}
+        }
 
     });
 })(jQuery);
-
