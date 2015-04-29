@@ -41,11 +41,11 @@ ul.tagit li.tagit-choice .tagit-close {
     line-height: 17px;
 }
 
-/* used for some custom themes that don't need image icons  //may have to remove later for close button on tag it 
-ul.tagit li.tagit-choice .tagit-close .text-icon {
+/* used for some custom themes that don't need image icons */
+/*ul.tagit li.tagit-choice .tagit-close .text-icon {
     display: none;
-}
-*/
+}*/
+
 ul.tagit li.tagit-choice input {
     display: block;
     float: left;
